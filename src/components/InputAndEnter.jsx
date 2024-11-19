@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const InputAndEnter = ({ onSubmit }) => {
+const InputAndEnter = ({ value, onChange, onSubmit, placeholder }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isActive, setIsActive] = useState(false);
 
@@ -15,8 +15,8 @@ const InputAndEnter = ({ onSubmit }) => {
         border: 'transparent',
         boxShadow: '0 12px 16px 0 rgba(0, 0, 0, 0.24)',
         background: isHovered
-        ? 'linear-gradient(90deg, #FC466B 0%, #3F5EFB 100%)'
-        : '#2E2E2E',
+            ? 'linear-gradient(90deg, #FC466B 0%, #3F5EFB 100%)'
+            : '#2E2E2E',
         borderRadius: '0 10px 10px 0',
         transition: '0.3s',
         cursor: 'pointer',
@@ -25,26 +25,28 @@ const InputAndEnter = ({ onSubmit }) => {
 
     return (
         <div style={styles.inputGroup}>
-        <input
-            placeholder="Type here"
-            type="text"
-            style={styles.inputField}
-        />
-        <button
-            style={buttonStyle}
-            onClick={onSubmit}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-        >
-            <span style={styles.buttonText}>ADD</span>
-        </button>
+            <input
+                type="text"
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder || "Type here"}
+                style={styles.inputField}
+            />
+            <button
+                style={buttonStyle}
+                onClick={onSubmit}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+            >
+                <span style={styles.buttonText}>Enter</span>
+            </button>
         </div>
     );
-    };
+};
 
-    const styles = {
+const styles = {
     inputGroup: {
         display: 'flex',
         flexDirection: 'row',
@@ -60,7 +62,8 @@ const InputAndEnter = ({ onSubmit }) => {
         paddingLeft: '8px',
         color: 'white',
         fontSize: '14px',
-        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
+        fontFamily:
+            'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
     },
     buttonText: {
         fontWeight: 800,
