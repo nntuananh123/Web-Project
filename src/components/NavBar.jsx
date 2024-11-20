@@ -9,7 +9,7 @@ const Navbar = ({ showSearch }) => {
                     </svg></span></a>
                 {showSearch && <Search />}
                 <ul class="navbar-nav">
-                  <li class="nav-item"><a class="nav-link" href="MenuPage">Menu</a></li>
+                  <li class="nav-item"><a class="nav-link" href="Menu">Menu</a></li>
                   <li class="nav-item"><a class="nav-link" href="Cart">Cart</a></li>
                 </ul>
         </div>

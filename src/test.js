@@ -1,86 +1,130 @@
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import NavBar from './components/NavBar';
 
-const Cart = () => {
-  const [cartItems, setCartItems] = useState([
+const ListCart = () => {
+  // Dữ liệu sản phẩm sử dụng state
+  const [products, setProducts] = useState([
     {
-      id: '1168761308',
+      id: 1168761308,
+      quantity: 2,
       name: 'Vintage Clock',
       category: 'Tech',
       price: 18.34,
-      quantity: 2,
-      img: 'https://cdn.bootstrapstudio.io/products/product-21_sm.jpg',
+      image: 'https://cdn.bootstrapstudio.io/products/product-21_sm.jpg',
     },
     {
-      id: '589605485',
+      id: 589605485,
+      quantity: 1,
       name: 'Reusable Cup',
       category: 'Cups',
       price: 35.39,
-      quantity: 1,
-      img: 'https://cdn.bootstrapstudio.io/products/product-18_sm.jpg',
+      image: 'https://cdn.bootstrapstudio.io/products/product-18_sm.jpg',
     },
   ]);
 
-  const updateQuantity = (id, delta) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(item.quantity + delta, 1) }
-          : item
+  // Hàm để tăng số lượng
+  const handleIncrease = (id) => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === id
+          ? { ...product, quantity: product.quantity + 1 }
+          : product
       )
     );
   };
 
-  const removeItem = (id) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  // Hàm để giảm số lượng
+  const handleDecrease = (id) => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === id && product.quantity > 1
+          ? { ...product, quantity: product.quantity - 1 }
+          : product
+      )
+    );
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // Hàm để xóa sản phẩm
+  const handleRemove = (id) => {
+    setProducts((prevProducts) =>
+      prevProducts.filter((product) => product.id !== id)
+    );
+  };
+
+  // Hàm tính tổng tiền
+  const calculateTotal = () => {
+    return products.reduce((total, product) => total + product.price * product.quantity, 0).toFixed(2);
+  };
 
   return (
-    <>
-      <Helmet>
-        <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css" />
-      </Helmet>
-      <NavBar showSearch={false} />
-      <section className="py-5">
-        <div className="container py-5">
-          <h2>Shopping Cart</h2>
-          {cartItems.map((item) => (
-            <div key={item.id} className="d-flex align-items-center mb-4">
-              <img src={item.img} alt={item.name} className="img-thumbnail" style={{ width: '100px' }} />
-              <div className="ms-3">
-                <h5>{item.name}</h5>
-                <p className="mb-1">{item.category}</p>
-                {item.variant && <p className="mb-1">{item.variant}</p>}
-                <p className="fw-bold">${item.price.toFixed(2)}</p>
+    <div className="container py-5">
+      <div className="row mx-auto">
+        <div className="col">
+          <div data-reflow-type="shopping-cart">
+            <div className="reflow-shopping-cart" style={{ display: 'block' }}>
+              <div className="ref-heading">Shopping Cart</div>
+              <div className="ref-th">
+                <div className="ref-product-col">Product</div>
+                <div className="ref-price-col">Price</div>
+                <div className="ref-quantity-col">Quantity</div>
+                <div className="ref-total-col">Total</div>
               </div>
-              <div className="ms-auto">
-                <button className="btn btn-outline-secondary" onClick={() => updateQuantity(item.id, -1)}>-</button>
-                <input
-                  type="text"
-                  value={item.quantity}
-                  className="form-control d-inline-block mx-2"
-                  style={{ width: '50px', textAlign: 'center' }}
-                  readOnly
-                />
-                <button className="btn btn-outline-secondary" onClick={() => updateQuantity(item.id, 1)}>+</button>
+              <div className="ref-cart-table">
+                {products.map((product) => (
+                  <div className="ref-product" key={product.id} data-id={product.id} data-quantity={product.quantity}>
+                    <div className="ref-product-col">
+                      <div className="ref-product-wrapper">
+                        <img className="ref-product-photo" src={product.image} alt={product.name} />
+                        <div className="ref-product-data">
+                          <div className="ref-product-info">
+                            <div>
+                              <div className="ref-product-name">{product.name}</div>
+                              <div className="ref-product-category">{product.category}</div>
+                            </div>
+                            <div className="ref-product-price ref-mobile-product-price">${product.price.toFixed(2)}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="ref-price-col">
+                      <div className="ref-product-price">${product.price.toFixed(2)}</div>
+                    </div>
+                    <div className="ref-quantity-col">
+                      <div className="ref-product-quantity">
+                        <div className="ref-quantity-container">
+                          <div className="ref-quantity-widget">
+                            <div className="ref-decrease" onClick={() => handleDecrease(product.id)}>
+                              <span>-</span>
+                            </div>
+                            <input type="text" value={product.quantity} readOnly />
+                            <div className="ref-increase" onClick={() => handleIncrease(product.id)}>
+                              <span>+</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="ref-total-col">
+                      <div className="ref-product-total">
+                        <div className="ref-product-total-sum">${(product.price * product.quantity).toFixed(2)}</div>
+                      </div>
+                    </div>
+                    <div className="ref-product-remove" onClick={() => handleRemove(product.id)} style={{ cursor: 'pointer', color: 'red' }}>
+                      Remove
+                    </div>
+                  </div>
+                ))}
               </div>
-              <button className="btn btn-danger ms-3" onClick={() => removeItem(item.id)}>
-                Remove
-              </button>
+              <div className="ref-totals">
+                <div className="ref-subtotal">Subtotal: ${calculateTotal()}</div>
+                <div className="ref-button ref-standard-checkout-button">Checkout</div>
+              </div>
             </div>
-          ))}
-          <div className="mt-4">
-            <h4>Subtotal: ${subtotal.toFixed(2)}</h4>
-            <button className="btn btn-primary mt-3">Proceed to Checkout</button>
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </div>
   );
 };
 
-export default Cart;
+export default ListCart;

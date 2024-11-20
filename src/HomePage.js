@@ -4,8 +4,6 @@ import InputAndEnter from './components/InputAndEnter';
 import { useState } from 'react';
 
 
-
-
 function HomePage() {
 
   const navigate = useNavigate(); 

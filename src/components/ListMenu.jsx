@@ -1,5 +1,5 @@
 import React from 'react';
-const ListProducts = () => {
+const ListMenu = () => {
   return (
         <div class="container py-5">
             <div class="row mx-auto">
@@ -206,4 +206,4 @@ const ListProducts = () => {
   );
 };
 
-export default ListProducts;
+export default ListMenu;

@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import NavBar from './components/NavBar';
 import Category from './components/Category';
-import ListProducts from './components/ListProducts';
+import ListMenu from './components/ListMenu';
 
 
 function MenuPage() {
@@ -16,9 +16,9 @@ return (
     </Helmet>
     <NavBar showSearch={true} />
     <Category />
-    <ListProducts />
+    <ListMenu />
   </>
-);
+  );
 }
 
 export default MenuPage;

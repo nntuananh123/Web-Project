@@ -5,6 +5,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import HomePage from './HomePage';
 import MenuPage from './MenuPage';
 import Cart from './Cart';
+import Staff from './Staff';
 
 
 function App() {
@@ -12,8 +13,9 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/MenuPage" element={<MenuPage />} />
+        <Route path="/Menu" element={<MenuPage />} />
         <Route path="/Cart" element={<Cart />} />
+        <Route path="/Staff" element={<Staff />} />
       </Routes>
     </Router>
   );
