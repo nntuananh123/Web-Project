@@ -1,107 +1,111 @@
-import React from 'react';
+import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const ListCheck = () => {
+const ListCart = () => {
+  const [products, setProducts] = useState([
+    {
+      id: 1168761308,
+      quantity: 2,
+      name: 'Vintage Clock',
+      category: 'Tech',
+      price: 18.34,
+      image: 'https://cdn.bootstrapstudio.io/products/product-21_sm.jpg',
+      status: 'none', // Trạng thái xử lý
+    },
+    {
+      id: 589605485,
+      quantity: 1,
+      name: 'Reusable Cup',
+      category: 'Cups',
+      price: 35.39,
+      image: 'https://cdn.bootstrapstudio.io/products/product-18_sm.jpg',
+      status: 'none', // Trạng thái xử lý
+    },
+  ]);
+
+  const handleRemove = (id) => {
+    setProducts((prevProducts) =>
+      prevProducts.filter((product) => product.id !== id)
+    );
+  };
+
+  const handleStatusToggle = (id) => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === id
+          ? {
+              ...product,
+              status:
+                product.status === 'none'
+                  ? 'pending'
+                  : product.status === 'pending'
+                  ? 'finished'
+                  : 'none',
+            }
+          : product
+      )
+    );
+  };
+
   return (
     <div className="container py-5">
-      <div className="row mx-auto">
+      <div className="row">
         <div className="col">
-          <div data-reflow-type="shopping-cart">
-            <div className="reflow-shopping-cart" style={{ display: 'block' }}>
-              <div className="ref-loading-overlay"></div>
-
-              <div className="ref-cart" style={{ display: 'block' }}>
-                <div className="ref-th">
-                  <div className="ref-table-col">Table</div>
-                  <div className="ref-items-col">Items</div>
-                  <div className="ref-quantity-col">Quantity</div>
-                  <div className="ref-price-col">Price</div>
-                  <div className="ref-total-col">Total</div>
+          <div className="shopping-cart">
+            {/* Header */}
+            <div className="d-flex fw-bold border-bottom pb-2">
+              <div className="col-1 text-center border-end">Table</div>
+              <div className="col-4 ps-3 border-end">Product</div>
+              <div className="col-2 text-center border-end">Price</div>
+              <div className="col-2 text-center border-end">Quantity</div>
+              <div className="col-2 text-center border-end">Total</div>
+              <div className="col-1 text-center">Status</div>
+            </div>
+            {/* Body */}
+            {products.map((product, index) => (
+              <div className="d-flex align-items-center py-2 border-bottom" key={product.id}>
+                <div className="col-1 text-center border-end">{index + 1}</div>
+                <div className="col-4 ps-3 border-end">{product.name}</div>
+                <div className="col-2 text-center border-end">${product.price.toFixed(2)}</div>
+                <div className="col-2 text-center border-end">{product.quantity}</div>
+                <div className="col-2 text-center border-end">
+                  ${(product.price * product.quantity).toFixed(2)}
                 </div>
-                <div className="ref-cart-table">
-                  {[
-                    {
-                      id: 1168761308,
-                      quantity: 2,
-                      name: 'Vintage Clock',
-                      category: 'Tech',
-                      price: 18.34,
-                    },
-                    {
-                      id: 589605485,
-                      quantity: 1,
-                      name: 'Reusable Cup',
-                      category: 'Cups',
-                      price: 35.39,
-                    },
-                  ].map((product) => (
-                    <div className="ref-product" key={product.id} data-id={product.id} data-quantity={product.quantity}>
-                         <div className="ref-quantity-col">
-                            <div className="ref-product-quantity">
-                            <div className="ref-quantity-container">
-                                <div className="ref-quantity-widget">
-                                <div className="ref-decrease"><span></span></div>
-                                <input type="text" value={product.quantity} />
-                                <div className="ref-increase"><span></span></div>
-                                </div>
-                            </div>
-                            <div className="ref-product-remove">Remove</div>
-                            </div>
-                        </div>
-                        <div className="ref-product-col">
-                            <div className="ref-product-wrapper">
-                            <div className="ref-product-data">
-                                <div className="ref-product-info">
-                                <div>
-                                    <div className="ref-product-name">{product.name}</div>
-                                    <div className="ref-product-category">{product.category}</div>
-                                </div>
-                                <div className="ref-product-price ref-mobile-product-price">${product.price.toFixed(2)}</div>
-                                </div>
-                                <div className="ref-product-controls ref-mobile-product-controls" style={{justifyContent: 'space-between'}}>
-                                <div className="ref-product-quantity">
-                                    <div className="ref-quantity-container">
-                                    <div className="ref-quantity-widget">
-                                        <div className="ref-decrease"><span></span></div>
-                                        <input type="text" value={product.quantity} />
-                                        <div className="ref-increase"><span></span></div>
-                                    </div>
-                                    </div>
-                                </div>
-                                <div className="ref-product-remove">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 48 48">
-                                    <path fill="currentColor" d="M13.05 42q-1.2 0-2.1-.9-.9-.9-.9-2.1V10.5H8v-3h9.4V6h13.2v1.5H40v3h-2.05V39q0 1.2-.9 2.1-.9.9-2.1.9Z"></path>
-                                    </svg>
-                                </div>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                        <div className="ref-price-col">
-                            <div className="ref-product-price">${product.price.toFixed(2)}</div>
-                        </div>
-                        <div className="ref-quantity-col">
-                            <div className="ref-product-quantity">
-                            <div className="ref-quantity-container">
-                                <div className="ref-quantity-widget">
-                                <div className="ref-decrease"><span></span></div>
-                                <input type="text" value={product.quantity} />
-                                <div className="ref-increase"><span></span></div>
-                                </div>
-                            </div>
-                            <div className="ref-product-remove">Remove</div>
-                            </div>
-                        </div>
-                        <div className="ref-total-col">
-                            <div className="ref-product-total">
-                            <div className="ref-product-total-sum">${(product.price * product.quantity).toFixed(2)}</div>
-                            </div>
-                        </div>
-                    </div>
-                  ))}
+                <div className="col-1 text-center">
+                  {product.status === 'none' && (
+                    <>
+                      <button
+                        className="btn btn-success btn-sm mx-1"
+                        onClick={() => handleStatusToggle(product.id)}
+                      >
+                        ✔
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleRemove(product.id)}
+                      >
+                        ✖
+                      </button>
+                    </>
+                  )}
+                  {product.status === 'pending' && (
+                    <>
+                      <span className="badge bg-warning text-dark">Pending</span>
+                      <button
+                        className="btn btn-success btn-sm mx-1"
+                        onClick={() => handleStatusToggle(product.id)}
+                      >
+                        ✔
+                      </button>
+                    </>
+                  )}
+                  {product.status === 'finished' && (
+                    <span className="badge bg-success text-dark">Finished</span>
+                  )}
                 </div>
               </div>
-            </div>
+            ))}
+
           </div>
         </div>
       </div>
@@ -109,4 +113,4 @@ const ListCheck = () => {
   );
 };
 
-export default ListCheck;
+export default ListCart;
