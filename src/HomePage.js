@@ -6,9 +6,7 @@ import { useState } from 'react';
 
 
 function HomePage() {
-
   const navigate = useNavigate(); 
-
   const goToMenuPage = () => {
     navigate('/Menu'); 
   };
