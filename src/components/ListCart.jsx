@@ -77,7 +77,17 @@ const fetchProducts = async () => {
           : product
       )
     );
+  
+    // Cập nhật trong localStorage
+    const orderDetails = JSON.parse(localStorage.getItem("orderDetails")) || [];
+    const updatedOrderDetails = orderDetails.map((item) =>
+      item.productId === id
+        ? { ...item, quantity: item.quantity + 1 }
+        : item
+    );
+    localStorage.setItem("orderDetails", JSON.stringify(updatedOrderDetails));
   };
+  
 
   // Hàm để giảm số lượng
   const handleDecrease = (id) => {
@@ -88,20 +98,102 @@ const fetchProducts = async () => {
           : product
       )
     );
+  
+    // Cập nhật trong localStorage
+    const orderDetails = JSON.parse(localStorage.getItem("orderDetails")) || [];
+    const updatedOrderDetails = orderDetails.map((item) =>
+      item.productId === id && item.quantity > 1
+        ? { ...item, quantity: item.quantity - 1 }
+        : item
+    );
+    localStorage.setItem("orderDetails", JSON.stringify(updatedOrderDetails));
   };
+  
 
   // Hàm để xóa sản phẩm
   const handleRemove = (id) => {
-    setProducts((prevProducts) =>
-      prevProducts.filter((product) => product.id !== id)
-    );
+    try {
+      // Lấy danh sách orderDetails từ localStorage
+      const orderDetails = JSON.parse(localStorage.getItem("orderDetails")) || [];
+  
+      // Lọc bỏ sản phẩm có productId trùng với id
+      const updatedOrderDetails = orderDetails.filter(
+        (item) => item.productId !== id
+      );
+  
+      // Lưu danh sách mới vào localStorage
+      localStorage.setItem("orderDetails", JSON.stringify(updatedOrderDetails));
+    
+      // Cập nhật lại giao diện (nếu cần)
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) => product.id !== id)
+      );
+    } catch (error) {
+      console.error("Error removing product from localStorage:", error);
+    }
   };
+  
 
   // Hàm tính tổng tiền
   const calculateTotal = () => {
     return products.reduce((total, product) => total + product.price * product.quantity, 0).toFixed(2);
   };
 
+  const handleSubmitOrderDetails = async () => {
+    try {
+      // Lấy thông tin từ localStorage
+      const orderId = localStorage.getItem("orderId");
+      const orderDetails = JSON.parse(localStorage.getItem("orderDetails")) || [];
+  
+      // Kiểm tra nếu không có orderId hoặc orderDetails trống
+      if (!orderId || orderDetails.length === 0) {
+        alert("No order or products to submit.");
+        return;
+      }
+  
+      // Lặp qua từng sản phẩm và gửi POST request
+      for (const { productId, quantity } of orderDetails) {
+        const response = await fetch("http://localhost:8080/mycoffee/order-detail", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderId,
+            productId,
+            quantity,
+          }),
+        });
+  
+        // Kiểm tra phản hồi
+        if (!response.ok) {
+          throw new Error(`Failed to submit product ${productId}`);
+        }
+  
+        const data = await response.json();
+        if (data.code === 0) {
+          console.log(
+            `Successfully submitted product ${productId} with quantity ${quantity}.`
+          );
+        } else {
+          console.warn(`Error submitting product ${productId}: ${data.message}`);
+        }
+      }
+  
+      alert("All products submitted successfully.");
+    } catch (error) {
+      console.error("Error submitting order details:", error);
+      alert("Failed to submit order details.");
+    }
+    try {
+      // Xóa tất cả dữ liệu trong localStorage
+      localStorage.clear();
+    } catch (error) {
+      console.error("Error clearing local storage:", error);
+    }
+      // Reload lại trang
+    window.location.reload();
+  };
 
   return (
     <div className="container py-5">
@@ -179,7 +271,7 @@ const fetchProducts = async () => {
                 </div>
                   <div className="ref-totals">
                     <div className="ref-subtotal">Subtotal: ${calculateTotal()}</div>
-                    <div class="ref-button ref-standard-checkout-button">Checkout</div>
+                    <div class="ref-button ref-standard-checkout-button" onClick = {handleSubmitOrderDetails}>Checkout</div>
                 </div>
               </div>
             </div>
