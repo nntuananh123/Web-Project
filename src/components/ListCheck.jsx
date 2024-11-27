@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 const ListCart = () => {
   const [products, setProducts] = useState([

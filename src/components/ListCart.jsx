@@ -1,26 +1,72 @@
-import React, {useState} from 'react';
+import React from 'react';
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const ListCart = () => {
-  // Dữ liệu sản phẩm sử dụng state
-  const [products, setProducts] = useState([
-    {
-      id: 1168761308,
-      quantity: 2,
-      name: 'Vintage Clock',
-      category: 'Tech',
-      price: 18.34,
-      image: 'https://cdn.bootstrapstudio.io/products/product-21_sm.jpg',
-    },
-    {
-      id: 589605485,
-      quantity: 1,
-      name: 'Reusable Cup',
-      category: 'Cups',
-      price: 35.39,
-      image: 'https://cdn.bootstrapstudio.io/products/product-18_sm.jpg',
-    },
-  ]);
+
+  const [products, setProducts] = useState([]);
+
+const fetchProducts = async () => {
+  try {
+    // Lấy danh sách orderDetails từ localStorage
+    const orderDetails = JSON.parse(localStorage.getItem("orderDetails")) || [];
+
+    // Nếu không có orderDetails, không cần tiếp tục
+    if (orderDetails.length === 0) {
+      console.warn("No products in localStorage to fetch.");
+      return;
+    }
+
+    // Gửi yêu cầu API để lấy danh sách sản phẩm
+    const response = await fetch("http://localhost:8080/mycoffee/product");
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch products.");
+    }
+
+    const data = await response.json();
+    
+    // Kiểm tra xem có trường result không
+    const productsData = data.result || []; // Lấy mảng sản phẩm từ trường 'result'
+
+    // Lọc các sản phẩm có productId có trong orderDetails
+    const filteredProducts = productsData.filter(product =>
+      orderDetails.some(item => item.productId === product.id) // Lọc sản phẩm theo productId có trong orderDetails
+    );
+
+    // Ánh xạ sản phẩm kèm theo quantity, table, orderId từ localStorage
+    const mappedProducts = filteredProducts.map((item) => {
+      const orderDetail = orderDetails.find(detail => detail.productId === item.id);
+      return {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        category: item.category.name,
+        image_url: item.image_url,
+        quantity: orderDetail ? orderDetail.quantity : 0, // Thêm quantity từ orderDetails
+        table: orderDetail ? orderDetail.table : 0, // Thêm table từ orderDetails
+        orderId: orderDetail ? orderDetail.orderId : '', // Thêm orderId từ orderDetails
+      };
+    });
+
+    // Lưu vào state
+    setProducts(mappedProducts);
+  } catch (error) {
+    console.error("Failed to fetch products:", error);
+  }
+};
+
+  
+
+  useEffect(() => {
+    fetchProducts();
+    
+  }, []);
+
+  
+
+
 
   // Hàm để tăng số lượng
   const handleIncrease = (id) => {
@@ -80,7 +126,7 @@ const ListCart = () => {
                     <div className="ref-product" key={product.id} data-id={product.id} data-quantity={product.quantity}>
                       <div className="ref-product-col">
                         <div className="ref-product-wrapper">
-                          <img className="ref-product-photo" src={product.image} alt={product.name} />
+                          <img className="ref-product-photo" src={product.image_url} alt={product.name} />
                           <div className="ref-product-data">
                             <div className="ref-product-info">
                               <div>
