@@ -195,6 +195,52 @@ const fetchProducts = async () => {
     window.location.reload();
   };
 
+  const handleUpdateOrder = async () => {
+    try {
+      // Lấy orderId và table từ localStorage
+      const orderId = localStorage.getItem("orderId");
+      const table = parseInt(localStorage.getItem("table"), 10);
+  
+      if (!orderId || isNaN(table)) {
+        alert("Order ID or table not found in localStorage.");
+        return;
+      }
+  
+      // Tính tổng giá từ hàm calculateTotal
+      const totalPrice = calculateTotal();
+  
+      // Tạo Request body
+      const requestBody = {
+        table,
+        totalPrice: parseFloat(totalPrice), // Chuyển đổi từ chuỗi sang số
+      };
+  
+      // Gửi yêu cầu PUT đến API
+      const response = await fetch(`http://localhost:8080/mycoffee/order/${orderId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to update order.");
+      }
+  
+      const data = await response.json();
+      if (data.code === 0) {
+        alert("Order updated successfully.");
+      } else {
+        alert(`Failed to update order: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Error updating order:", error);
+      alert("An error occurred while updating the order.");
+    }
+    handleSubmitOrderDetails();
+  };
+
   return (
     <div className="container py-5">
       <div className="row mx-auto">
@@ -271,7 +317,7 @@ const fetchProducts = async () => {
                 </div>
                   <div className="ref-totals">
                     <div className="ref-subtotal">Subtotal: ${calculateTotal()}</div>
-                    <div class="ref-button ref-standard-checkout-button" onClick = {handleSubmitOrderDetails}>Checkout</div>
+                    <div class="ref-button ref-standard-checkout-button" onClick = {handleUpdateOrder}>Checkout</div>
                 </div>
               </div>
             </div>

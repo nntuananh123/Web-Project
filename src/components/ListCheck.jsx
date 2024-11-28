@@ -5,12 +5,44 @@ import { useLocation } from "react-router-dom";
 
 const ListCart = () => {
 
+  const [orders, setOrders] = useState([]);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/mycoffee/order/with-details");
+      const data = await response.json();
+  
+      // Kiểm tra xem có trường result không
+      const ordersData = data.result || []; // Lấy mảng đơn hàng từ trường 'result'
+  
+      // Ánh xạ đơn hàng
+      const mappedOrders = ordersData.map((order) => ({
+        orderId: order.orderId,
+        table: order.table,
+        totalPrice: order.totalPrice,
+        orderDetails: order.orderDetails.map((detail) => ({
+          quantity: detail.quantity,
+          productName: detail.productName,
+          image: detail.image,
+          price: detail.price,
+        })),
+      }));
+  
+      setOrders(mappedOrders);
+    } catch (error) {
+      console.error("Failed to fetch orders:", error);
+    }
+  };
+  
+  useEffect(() => {
+    fetchOrders();
+  }, []);
   
   const [products, setProducts] = useState([
     {
       id: 1168761308,
       quantity: 2,
-      name: 'Vintage Clock',
+      name: '1. Vintage Clock',
       category: 'Tech',
       price: 18.34,
       image: 'https://cdn.bootstrapstudio.io/products/product-21_sm.jpg',
@@ -19,7 +51,7 @@ const ListCart = () => {
     {
       id: 589605485,
       quantity: 1,
-      name: 'Reusable Cup',
+      name: '2. Reusable Cup',
       category: 'Cups',
       price: 35.39,
       image: 'https://cdn.bootstrapstudio.io/products/product-18_sm.jpg',
