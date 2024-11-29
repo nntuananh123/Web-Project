@@ -25,7 +25,6 @@ const ListCheck = () => {
           productName: detail.productName,
           image: detail.image,
           price: detail.price,
-          status: "none", // Trạng thái của sản phẩm
         })),
       }));
 
@@ -39,40 +38,24 @@ const ListCheck = () => {
     fetchOrders();
   }, []);
 
-  const handleRemove = (orderId, productName) => {
+  const handleRemove = (orderId) => {
     setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.orderId === orderId
-          ? {
-              ...order,
-              orderDetails: order.orderDetails.filter(
-                (detail) => detail.productName !== productName
-              ),
-            }
-          : order
-      )
+      prevOrders.filter((order) => order.orderId !== orderId)
     );
   };
 
-  const handleStatusToggle = (orderId, productName) => {
+  const handleStatusToggle = (orderId) => {
     setOrders((prevOrders) =>
       prevOrders.map((order) =>
         order.orderId === orderId
           ? {
               ...order,
-              orderDetails: order.orderDetails.map((detail) =>
-                detail.productName === productName
-                  ? {
-                      ...detail,
-                      status:
-                        detail.status === "none"
-                          ? "pending"
-                          : detail.status === "pending"
-                          ? "finished"
-                          : "none",
-                    }
-                  : detail
-              ),
+              status:
+                order.status === "none"
+                  ? "pending"
+                  : order.status === "pending"
+                  ? "finished"
+                  : "none",
             }
           : order
       )
@@ -80,55 +63,65 @@ const ListCheck = () => {
   };
 
   return (
-    <div>
-  <div className="container py-5">
-    <div className="row">
-      <div className="col">
-        <div className="shopping-cart">
-          {/* Header */}
-          <div className="d-flex fw-bold border-bottom pb-2">
-            <div className="col-1 text-center border-end">Table</div>
-            <div className="col-5 text-center border-end">Product</div>
-            <div className="col-2 text-center border-end">Price</div>
-            <div className="col-1 text-center border-end">Quantity</div>
-            <div className="col-2 text-center border-end">Total</div>
-            <div className="col-1 text-center">Status</div>
-          </div>
-          {/* Body */}
-          {orders.map((order) => {
-            let isFirstDetail = true; // Đánh dấu lần đầu tiên hiển thị
-            return (
-              <React.Fragment key={order.orderId}>
-                <div className="border-bottom">
+  <div>
+    <div className="container py-5">
+      <div className="row">
+        <div className="col">
+          <div className="shopping-cart">
+            {/* Header */}
+            <div className="row fw-bold border-bottom pb-2">
+              <div className="col-1 text-center border-end">Table</div>
+              <div className="col-4 text-center border-end">Product</div>
+              <div className="col-2 text-center border-end">Price</div>
+              <div className="col-1 text-center border-end">Quantity</div>
+              <div className="col-2 text-center border-end">Total</div>
+              <div className="col-2 text-center">Status</div>
+            </div>
+            {/* Body */}
+            {orders.map((order, orderIndex) => {
+              let isFirstDetail = true; // Đánh dấu lần đầu tiên hiển thị
+              return (
+                <div
+                  className={`order-group ${
+                    orderIndex > 0 ? "border-top-solid" : ""
+                  }`}
+                  key={order.orderId}
+                >
                   {order.orderDetails.map((detail, index) => {
                     const row = (
-                      <div className="row-group py-2" key={`${order.orderId}-${index}`}>
-                        <div className="col-1 text-center">
+                      <div
+                        className={`row py-2 align-items-center ${
+                          index === order.orderDetails.length - 1
+                            ? ""
+                            : "border-bottom-dashed"
+                        }`}
+                        key={`${order.orderId}-${index}`}
+                        style={{ height: "52.5208px" }}
+                      >
+                        <div className="col-1 text-center border-end">
                           {isFirstDetail ? order.table : ""}
                         </div>
-                        <div className="col-5 ps-3">
+                        <div className="col-4 ps-3 border-end">
                           {detail.productName}
                         </div>
-                        <div className="col-2 text-center">
+                        <div className="col-2 text-center border-end">
                           ${detail.price.toFixed(2)}
                         </div>
-                        <div className="col-1 text-center">
+                        <div className="col-1 text-center border-end">
                           {detail.quantity}
                         </div>
-                        <div className="col-2 text-center">
-                          {isFirstDetail
-                            ? `$${order.totalPrice.toFixed(2)}`
-                            : ""}
+                        <div className="col-2 text-center border-end">
+                          {isFirstDetail ? `$${order.totalPrice.toFixed(2)}` : ""}
                         </div>
-                        <div className="col-1 text-center">
+                        <div className="col-2 text-center">
                           {isFirstDetail && (
                             <>
-                              {detail.status === "none" && (
-                                <>
+                              {order.status === "none" && (
+                                <div className="status-btn-group">
                                   <button
-                                    className="btn btn-success btn-sm mx-2"
+                                    className="btn btn-success btn-sm"
                                     onClick={() =>
-                                      handleStatusToggle(order.orderId, detail.productName)
+                                      handleStatusToggle(order.orderId)
                                     }
                                   >
                                     ✔
@@ -136,28 +129,32 @@ const ListCheck = () => {
                                   <button
                                     className="btn btn-danger btn-sm"
                                     onClick={() =>
-                                      handleRemove(order.orderId, detail.productName)
+                                      handleRemove(order.orderId)
                                     }
                                   >
                                     ✖
                                   </button>
-                                </>
+                                </div>
                               )}
-                              {detail.status === "pending" && (
-                                <>
-                                  <span className="badge bg-warning text-dark">Pending</span>
+                              {order.status === "pending" && (
+                                <div className="status-btn-group">
+                                  <span className="badge bg-warning text-dark">
+                                    Pending
+                                  </span>
                                   <button
-                                    className="btn btn-success btn-sm mx-1"
+                                    className="btn btn-success btn-sm"
                                     onClick={() =>
-                                      handleStatusToggle(order.orderId, detail.productName)
+                                      handleStatusToggle(order.orderId)
                                     }
                                   >
                                     ✔
                                   </button>
-                                </>
+                                </div>
                               )}
-                              {detail.status === "finished" && (
-                                <span className="badge bg-success text-dark">Finished</span>
+                              {order.status === "finished" && (
+                                <span className="badge bg-success text-dark">
+                                  Finished
+                                </span>
                               )}
                             </>
                           )}
@@ -168,41 +165,54 @@ const ListCheck = () => {
                     return row;
                   })}
                 </div>
-              </React.Fragment>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
-  </div>
     <style jsx>{`
-    /* Container tổng */
-    .shopping-cart {
-      display: table; /* Gộp các hàng thành một bảng */
-      width: 100%;
-      border-collapse: collapse; /* Loại bỏ khoảng cách giữa các ô */
-    }
+      .shopping-cart {
+        width: 100%;
+        border-collapse: collapse;
+      }
 
-    /* Hàng (row) */
-    .row-group {
-      display: table-row; /* Gộp các cột thành hàng */
-    }
+      /* Border giữa các cột */
+      .row > div {
+        border-right: 1px solid #dee2e6;
+      }
 
-    /* Cột (cell) */
-    .row-group > div {
-      display: table-cell; /* Gộp các cell lại */
-      border-right: 1px solid #dee2e6; /* Đường viền dọc */
-      padding: 8px; /* Khoảng cách giữa nội dung */
-      vertical-align: middle; /* Căn giữa nội dung */
-    }
+      /* Xóa border-right cho cột cuối */
+      .row > div:last-child {
+        border-right: none;
+      }
 
-    /* Loại bỏ đường viền phải ở cột cuối */
-    .row-group > div:last-child {
-      border-right: none;
-    }
+      /* Loại bỏ border giữa các detail trong cùng một order-group */
+      .order-group > .row:last-child {
+        border-bottom: none;
+      }
+
+      /* Border nét liền giữa các order-group */
+      .border-top-solid {
+        border-top: 2px solid #FFFFFF; /* Điều chỉnh độ dày và màu của border */
+      }
+
+      .status-btn-group {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+      }
+
+  /* Đồng đều khoảng cách giữa các row */
+  .row {
+    padding-top: 10px; /* Khoảng cách phía trên */
+    padding-bottom: 10px; /* Khoảng cách phía dưới */
+  }
 
     `}</style>
-        </div>
+  </div>
+
+
   );
 };
 
