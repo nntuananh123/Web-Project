@@ -7,18 +7,35 @@ const ListCheck = () => {
 
   const fetchOrders = async () => {
     try {
+      // Lấy token từ localStorage
+      const token = localStorage.getItem("authToken");
+  
+      if (!token) {
+        console.error("No token found. Please log in.");
+        return;
+      }
+  
+      // Gửi request với Authorization Header
       const response = await fetch(
-        "http://localhost:8080/mycoffee/order/with-details"
+        "http://localhost:8080/mycoffee/order/with-details",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào Header
+            "Content-Type": "application/json", // Đảm bảo định dạng JSON
+          },
+        }
       );
+  
       const data = await response.json();
-
+  
       const ordersData = data.result || []; // Lấy mảng đơn hàng từ API
-
+  
       // Ánh xạ đơn hàng
       const mappedOrders = ordersData.map((order) => ({
         orderId: order.orderId,
         table: order.table,
         totalPrice: order.totalPrice,
+        created_at: order.created_at,
         status: "none", // Trạng thái mặc định
         orderDetails: order.orderDetails.map((detail) => ({
           quantity: detail.quantity,
@@ -27,12 +44,13 @@ const ListCheck = () => {
           price: detail.price,
         })),
       }));
-
+  
       setOrders(mappedOrders);
     } catch (error) {
       console.error("Failed to fetch orders:", error);
     }
   };
+  
 
   useEffect(() => {
     fetchOrders();
@@ -72,9 +90,10 @@ const ListCheck = () => {
             <div className="row fw-bold border-bottom pb-2">
               <div className="col-1 text-center border-end">Table</div>
               <div className="col-4 text-center border-end">Product</div>
-              <div className="col-2 text-center border-end">Price</div>
+              <div className="col-1 text-center border-end">Price</div>
               <div className="col-1 text-center border-end">Quantity</div>
-              <div className="col-2 text-center border-end">Total</div>
+              <div className="col-1 text-center border-end">Total</div>
+              <div className="col-2 text-center">Time</div>
               <div className="col-2 text-center">Status</div>
             </div>
             {/* Body */}
@@ -104,14 +123,17 @@ const ListCheck = () => {
                         <div className="col-4 ps-3 border-end">
                           {detail.productName}
                         </div>
-                        <div className="col-2 text-center border-end">
+                        <div className="col-1 text-center border-end">
                           ${detail.price.toFixed(2)}
                         </div>
                         <div className="col-1 text-center border-end">
                           {detail.quantity}
                         </div>
-                        <div className="col-2 text-center border-end">
+                        <div className="col-1 text-center border-end">
                           {isFirstDetail ? `$${order.totalPrice.toFixed(2)}` : ""}
+                        </div>
+                        <div className="col-2 text-center border-end">
+                          {isFirstDetail ? order.created_at : ""}
                         </div>
                         <div className="col-2 text-center">
                           {isFirstDetail && (
@@ -172,44 +194,52 @@ const ListCheck = () => {
       </div>
     </div>
     <style jsx>{`
-      .shopping-cart {
-        width: 100%;
-        border-collapse: collapse;
-      }
+  .shopping-cart {
+    width: 100%;
+    border-collapse: collapse;
+  }
 
-      /* Border giữa các cột */
-      .row > div {
-        border-right: 1px solid #dee2e6;
-      }
+  /* Border giữa các cột */
+  .row > div {
+    border-right: 1px solid #dee2e6;
+    height: 100%; /* Kéo dài toàn bộ chiều cao */
+  }
 
-      /* Xóa border-right cho cột cuối */
-      .row > div:last-child {
-        border-right: none;
-      }
+  /* Xóa border-right cho cột cuối */
+  .row > div:last-child {
+    border-right: none;
+  }
 
-      /* Loại bỏ border giữa các detail trong cùng một order-group */
-      .order-group > .row:last-child {
-        border-bottom: none;
-      }
+  /* Loại bỏ border giữa các detail trong cùng một order-group */
+  .order-group > .row:last-child {
+    border-bottom: none;
+  }
 
-      /* Border nét liền giữa các order-group */
-      .border-top-solid {
-        border-top: 2px solid #FFFFFF; /* Điều chỉnh độ dày và màu của border */
-      }
+  /* Border nét liền giữa các order-group */
+  .border-top-solid {
+    border-top: 2px solid #FFFFFF; /* Điều chỉnh độ dày và màu của border */
+  }
 
-      .status-btn-group {
-        display: flex;
-        justify-content: center;
-        gap: 4px;
-      }
+  .status-btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+  }
 
   /* Đồng đều khoảng cách giữa các row */
   .row {
     padding-top: 10px; /* Khoảng cách phía trên */
     padding-bottom: 10px; /* Khoảng cách phía dưới */
+    align-items: stretch; /* Kéo dài nội dung theo chiều cao */
   }
 
-    `}</style>
+  /* Đảm bảo các cột trong chi tiết đơn hàng liền mạch */
+  .row > div {
+    display: flex;
+    align-items: center;
+  }
+`}</style>
+
   </div>
 
 

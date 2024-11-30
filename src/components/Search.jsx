@@ -1,32 +1,69 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
 
-const Search = () => {
+const Search = ({ setSearchResults }) => {
+  const [keyword, setKeyword] = useState("");
+  const [debouncedKeyword, setDebouncedKeyword] = useState("");
+
+  // Debounce keyword (trì hoãn tìm kiếm khi người dùng gõ liên tục)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedKeyword(keyword);
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timer); // Xóa timer khi keyword thay đổi
+  }, [keyword]);
+
+  // Gọi API khi debouncedKeyword thay đổi
+  useEffect(() => {
+    const handleSearch = async () => {
+
+      try {
+        const response = await fetch(
+          `http://localhost:8080/mycoffee/product/search?keyword=${debouncedKeyword}`,
+          { method: "GET" }
+        );
+
+        if (!response.ok) throw new Error("Search API failed");
+
+        const data = await response.json();
+        const results = data.result || [];
+        setSearchResults(
+          results.map((item) => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            image_url: item.image_url,
+          }))
+        );
+      } catch (error) {
+        console.error("Error during search:", error);
+      }
+    };
+
+    handleSearch();
+  }, [debouncedKeyword, setSearchResults]);
+
   return (
     <>
-      <div class="d-flex align-items-center mx-auto">
-        <div class="search-box d-flex align-items-center border">
-          <input placeholder="Search..." class="input" type="text" />
-            <button class="btn-icon-content p-2" aria-label="Search">
-              <span class="search-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 512 512"
-                >
-                <path
-                d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
-                ></path>
-                </svg>
-              </span>
-            </button>
+      <div className="d-flex align-items-center mx-auto">
+        <div className="search-box d-flex align-items-center border">
+          <input
+            placeholder="Search..."
+            className="input"
+            type="text"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)} // Cập nhật keyword mỗi khi gõ
+          />
         </div>
       </div>
+
       <style jsx>{`
         .search-box {
           height: 45px;
           border-radius: 5px;
           background-color: #333333;
         }
-    
+
         .input {
           color: #cccccc;
           background-color: #333333;
@@ -34,21 +71,9 @@ const Search = () => {
           outline: none;
           padding: 5px;
         }
-    
+
         .input::placeholder {
           color: #808080;
-        }
-    
-        .btn-icon-content {
-          background-color: transparent;
-          border: none;
-          cursor: pointer;
-        }
-    
-        .search-icon svg {
-          width: 22px;
-          height: 30px;
-          fill: #ffffff;
         }
       `}</style>
     </>

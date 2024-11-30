@@ -1,31 +1,27 @@
 import React from 'react';
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-const ListMenu = () => {
+const ListMenu = ({ searchResults }) => {
   const [products, setProducts] = useState([]);
 
+  useEffect(() => {
+    if (searchResults.length > 0) {
+      setProducts(searchResults);
+    } 
+    else {
+      setProducts([]); // Rỗng nếu không có kết quả
+    }
+  }, [searchResults]);
+
   const fetchProducts = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/mycoffee/product");
-        const data = await response.json();
-      
-        // Kiểm tra xem có trường result không
-        const productsData = data.result || []; // Lấy mảng sản phẩm từ trường 'result'
-    
-        // Ánh xạ sản phẩm
-        const mappedProducts = productsData.map((item) => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          category: item.category.name,
-          image_url: item.image_url,
-        }));
-    
-        setProducts(mappedProducts);
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      }
-    };
+    try {
+      const response = await fetch("http://localhost:8080/mycoffee/product");
+      const data = await response.json();
+      setProducts(data.result || []);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    }
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -95,12 +91,6 @@ const ListMenu = () => {
     }
   };
   
-  
-
-
-
-
-
 
   return (
 
