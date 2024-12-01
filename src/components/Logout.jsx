@@ -36,9 +36,15 @@ const Logout = () => {
   };
 
   return (
-    <div className="container-fluid">
-      {/* Button fixed ở góc trên bên phải */}
-      <div className="position-fixed top-0 end-0 m-3">
+          <div className="container d-flex justify-content-between align-items-center">
+
+        {/* Search hoặc Shopping Cart */}
+        <div className="flex-grow-1 d-flex justify-content-center">
+            <span className="navbar-text text-light fs-2 ">Order Tracking</span>
+        </div>
+
+        {/* Cart Icon */}
+        <div className="position-absolute top-0 end-0 m-3">
         <button
           className="btn btn-primary shadow"
           type="button"
@@ -47,7 +53,21 @@ const Logout = () => {
           Log out
         </button>
       </div>
-    </div>
+      </div>
+
+    // <div className="container-fluid">
+    //   {/* Button fixed ở góc trên bên phải, nhưng không di chuyển khi cuộn */}
+      // <div className="position-absolute top-0 end-0 m-3">
+      // order tracking
+      //   <button
+      //     className="btn btn-primary shadow"
+      //     type="button"
+      //     onClick={handleLogout}  // Gọi hàm handleLogout khi bấm vào button
+      //   >
+      //     Log out
+      //   </button>
+      // </div>
+    // </div>
   );
 };
 

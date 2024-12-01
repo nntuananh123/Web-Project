@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const LoginForm = () => {
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -24,7 +27,7 @@ const LoginForm = () => {
         localStorage.setItem('authToken', token);
 
         // Điều hướng đến trang /Staff
-        window.location.href = '/Staff';
+        navigate('/Staff');
       } else {
         setErrorMessage('Invalid response from server.');
       }

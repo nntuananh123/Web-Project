@@ -5,9 +5,8 @@
   "dependencies": {
     "@babel/cli": "^7.25.9",
     "@babel/core": "^7.26.0",
-    "@babel/preset-env": "^7.26.0",
-    "@babel/preset-react": "^7.25.9",
     "@babel/preset-typescript": "^7.26.0",
+    "@stomp/stompjs": "^7.0.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -21,6 +20,8 @@
     "react-router-dom": "^6.27.0",
     "react-scripts": "^3.0.1",
     "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "sockjs-client": "^1.6.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -46,5 +47,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.25.9"
   }
 }

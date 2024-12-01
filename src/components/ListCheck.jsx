@@ -5,6 +5,14 @@ import { useEffect, useState } from "react";
 const ListCheck = () => {
   const [orders, setOrders] = useState([]);
 
+  const parseDate = (dateString) => {
+    const [date, time] = dateString.split(" ");
+    const [day, month, year] = date.split("-");
+    const [hours, minutes, seconds] = time.split(":");
+  
+    return new Date(year, month - 1, day, hours, minutes, seconds);
+  };
+  
   const fetchOrders = async () => {
     try {
       // Lấy token từ localStorage
@@ -36,7 +44,7 @@ const ListCheck = () => {
         table: order.table,
         totalPrice: order.totalPrice,
         created_at: order.created_at,
-        status: "none", // Trạng thái mặc định
+        status: order.status, // Trạng thái mặc định
         orderDetails: order.orderDetails.map((detail) => ({
           quantity: detail.quantity,
           productName: detail.productName,
@@ -44,7 +52,13 @@ const ListCheck = () => {
           price: detail.price,
         })),
       }));
-  
+
+      // Sắp xếp đơn hàng theo thời gian (mới nhất lên trên)
+      mappedOrders.sort((a, b) => {
+        const dateA = parseDate(a.created_at);
+        const dateB = parseDate(b.created_at);
+        return dateB - dateA; // Ngày gần nhất lên trên
+      });  
       setOrders(mappedOrders);
     } catch (error) {
       console.error("Failed to fetch orders:", error);
@@ -56,11 +70,40 @@ const ListCheck = () => {
     fetchOrders();
   }, []);
 
-  const handleRemove = (orderId) => {
-    setOrders((prevOrders) =>
-      prevOrders.filter((order) => order.orderId !== orderId)
-    );
+  const handleRemove = async (orderId) => {
+    try {
+      // Gửi request DELETE để xóa đơn hàng
+      const token = localStorage.getItem("authToken");
+  
+      if (!token) {
+        console.error("No token found. Please log in.");
+        return;
+      }
+  
+      const response = await fetch(
+        `http://localhost:8080/mycoffee/order/${orderId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      if (!response.ok) {
+        throw new Error("Failed to delete order");
+      }
+  
+      // Nếu xóa thành công, cập nhật lại danh sách đơn hàng
+      setOrders((prevOrders) =>
+        prevOrders.filter((order) => order.orderId !== orderId)
+      );
+    } catch (error) {
+      console.error("Failed to remove order:", error);
+    }
   };
+
 
   const handleStatusToggle = (orderId) => {
     setOrders((prevOrders) =>
@@ -81,170 +124,184 @@ const ListCheck = () => {
   };
 
   return (
-    
-  <div>
-
-    <div className="container py-5">
-      <div className="row">
-        <div className="col">
-          <div className="shopping-cart">
-            {/* Header */}
-            <div className="row fw-bold border-bottom pb-2">
-              <div className="col-1 text-center border-end">Table</div>
-              <div className="col-4 text-center border-end">Product</div>
-              <div className="col-1 text-center border-end">Price</div>
-              <div className="col-1 text-center border-end">Quantity</div>
-              <div className="col-1 text-center border-end">Total</div>
-              <div className="col-2 text-center">Time</div>
-              <div className="col-2 text-center">Status</div>
-            </div>
-            {/* Body */}
-            {orders.map((order, orderIndex) => {
-              let isFirstDetail = true; // Đánh dấu lần đầu tiên hiển thị
-              return (
-                <div
-                  className={`order-group ${
-                    orderIndex > 0 ? "border-top-solid" : ""
-                  }`}
-                  key={order.orderId}
-                >
-                  {order.orderDetails.map((detail, index) => {
-                    const row = (
-                      <div
-                        className={`row py-2 align-items-center ${
-                          index === order.orderDetails.length - 1
-                            ? ""
-                            : "border-bottom-dashed"
-                        }`}
-                        key={`${order.orderId}-${index}`}
-                        style={{ height: "52.5208px" }}
-                      >
-                        <div className="col-1 text-center border-end">
-                          {isFirstDetail ? order.table : ""}
-                        </div>
-                        <div className="col-4 ps-3 border-end">
-                          {detail.productName}
-                        </div>
-                        <div className="col-1 text-center border-end">
-                          ${detail.price.toFixed(2)}
-                        </div>
-                        <div className="col-1 text-center border-end">
-                          {detail.quantity}
-                        </div>
-                        <div className="col-1 text-center border-end">
-                          {isFirstDetail ? `$${order.totalPrice.toFixed(2)}` : ""}
-                        </div>
-                        <div className="col-2 text-center border-end">
-                          {isFirstDetail ? order.created_at : ""}
-                        </div>
-                        <div className="col-2 text-center">
-                          {isFirstDetail && (
-                            <>
-                              {order.status === "none" && (
-                                <div className="status-btn-group">
-                                  <button
-                                    className="btn btn-success btn-sm"
-                                    onClick={() =>
-                                      handleStatusToggle(order.orderId)
-                                    }
-                                  >
-                                    ✔
-                                  </button>
-                                  <button
-                                    className="btn btn-danger btn-sm"
-                                    onClick={() =>
-                                      handleRemove(order.orderId)
-                                    }
-                                  >
-                                    ✖
-                                  </button>
-                                </div>
-                              )}
-                              {order.status === "pending" && (
-                                <div className="status-btn-group">
-                                  <span className="badge bg-warning text-dark">
-                                    Pending
+    <div>
+      <div className="container py-5">
+        <div className="row">
+          <div className="col">
+            <div className="shopping-cart">
+              {/* Header */}
+              <div className="row fw-bold border-bottom pb-2">
+                <div className="col-1 text-center border-end">Table</div>
+                <div className="col-3-5 text-center border-end">Product</div>
+                <div className="col-1 text-center border-end">Quantity</div>
+                <div className="col-1-5 text-center border-end">Price</div>
+                <div className="col-1-5 text-center border-end">Total</div>
+                <div className="col-2 text-center">Time</div>
+                <div className="col-1-5 text-center">Status</div>
+              </div>
+              {/* Body */}
+              {orders.map((order, orderIndex) => {
+                let isFirstDetail = true; // Đánh dấu lần đầu tiên hiển thị
+                let productIndex = 1; // Đánh số thứ tự cho các sản phẩm trong mỗi orderId
+                return (
+                  <div
+                    className={`order-group ${
+                      orderIndex > 0 ? "border-top-solid" : ""
+                    }`}
+                    key={order.orderId}
+                  >
+                    {order.orderDetails.map((detail, index) => {
+                      const row = (
+                        <div
+                          className={`row py-2 align-items-center ${
+                            index === order.orderDetails.length - 1
+                              ? ""
+                              : "border-bottom-dashed"
+                          }`}
+                          key={`${order.orderId}-${index}`}
+                          style={{ height: "52.5208px" }}
+                        >
+                          <div className="col-1 text-center border-end">
+                            {isFirstDetail ? order.table : ""}
+                          </div>
+                          <div className="col-3-5 product-column border-end">
+                            {`${productIndex}. ${detail.productName}`}
+                          </div>
+                          <div className="col-1 text-center border-end">
+                            {detail.quantity}
+                          </div>
+                          <div className="col-1-5 text-center border-end">
+                            ${detail.price.toFixed(2)}
+                          </div>
+                          <div className="col-1-5 text-center border-end">
+                            {isFirstDetail ? `$${order.totalPrice.toFixed(2)}` : ""}
+                          </div>
+                          <div className="col-2 text-center border-end">
+                            {isFirstDetail ? order.created_at : ""}
+                          </div>
+                          <div className="col-1-5 text-center">
+                            {isFirstDetail && (
+                              <>
+                                {order.status === "NONE" && (
+                                  <div className="status-btn-group">
+                                    <button
+                                      className="btn btn-success btn-sm"
+                                      onClick={() =>
+                                        handleStatusToggle(order.orderId)
+                                      }
+                                    >
+                                      ✔
+                                    </button>
+                                    <button
+                                      className="btn btn-danger btn-sm"
+                                      onClick={() =>
+                                        handleRemove(order.orderId)
+                                      }
+                                    >
+                                      ✖
+                                    </button>
+                                  </div>
+                                )}
+                                {order.status === "pending" && (
+                                  <div className="status-btn-group">
+                                    <span className="badge bg-warning text-dark">
+                                      Pending
+                                    </span>
+                                    <button
+                                      className="btn btn-success btn-sm"
+                                      onClick={() =>
+                                        handleStatusToggle(order.orderId)
+                                      }
+                                    >
+                                      ✔
+                                    </button>
+                                  </div>
+                                )}
+                                {order.status === "finished" && (
+                                  <span className="badge bg-success text-dark">
+                                    Finished
                                   </span>
-                                  <button
-                                    className="btn btn-success btn-sm"
-                                    onClick={() =>
-                                      handleStatusToggle(order.orderId)
-                                    }
-                                  >
-                                    ✔
-                                  </button>
-                                </div>
-                              )}
-                              {order.status === "finished" && (
-                                <span className="badge bg-success text-dark">
-                                  Finished
-                                </span>
-                              )}
-                            </>
-                          )}
+                                )}
+                              </>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    );
-                    isFirstDetail = false; // Sau lần đầu tiên, không hiển thị nữa
-                    return row;
-                  })}
-                </div>
-              );
-            })}
+                      );
+                      productIndex++;
+                      isFirstDetail = false; // Sau lần đầu tiên, không hiển thị nữa
+                      return row;
+                    })}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
+      <style jsx>{`
+      .shopping-cart {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      /* Căn giữa cả chiều ngang và dọc cho tất cả các cột */
+      .row > div {
+        display: flex;
+        align-items: center; /* Căn giữa theo chiều dọc */
+        justify-content: center; /* Căn giữa theo chiều ngang */
+        border-right: 1px solid #dee2e6;
+        height: 100%;
+      }
+
+      /* Xóa border-right cho cột cuối */
+      .row > div:last-child {
+        border-right: none;
+      }
+
+      /* Loại bỏ border giữa các detail trong cùng một order-group */
+      .order-group > .row:last-child {
+        border-bottom: none;
+      }
+
+      /* Border nét liền giữa các order-group */
+      .border-top-solid {
+        border-top: 2px solid #FFFFFF;
+      }
+
+      /* Căn trái nội dung trong cột Product */
+      .product-column {
+        display: flex;
+        justify-content: flex-start !important; /* Căn trái nội dung */
+        align-items: center; /* Căn giữa theo chiều dọc */
+        text-align: left; /* Đảm bảo căn trái văn bản */
+        padding-left: 10px; /* Thêm khoảng cách nội bộ */
+      }
+
+
+      .status-btn-group {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+      }
+
+      /* Đồng đều khoảng cách giữa các row */
+      .row {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        align-items: stretch;
+      }
+
+      .col-1-5 {
+      flex: 0 0 12.5%; /* 1.5/12 * 100% = 12.5% */
+      max-width: 12.5%;
+      }
+
+      .col-3-5 {
+      flex: 0 0 29.167%; /* 3.5/12 * 100% */
+      max-width: 29.167%;
+      }
+    `}</style>
     </div>
-    <style jsx>{`
-  .shopping-cart {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  /* Border giữa các cột */
-  .row > div {
-    border-right: 1px solid #dee2e6;
-    height: 100%; /* Kéo dài toàn bộ chiều cao */
-  }
-
-  /* Xóa border-right cho cột cuối */
-  .row > div:last-child {
-    border-right: none;
-  }
-
-  /* Loại bỏ border giữa các detail trong cùng một order-group */
-  .order-group > .row:last-child {
-    border-bottom: none;
-  }
-
-  /* Border nét liền giữa các order-group */
-  .border-top-solid {
-    border-top: 2px solid #FFFFFF; /* Điều chỉnh độ dày và màu của border */
-  }
-
-  .status-btn-group {
-    display: flex;
-    justify-content: center;
-    gap: 4px;
-  }
-
-  /* Đồng đều khoảng cách giữa các row */
-  .row {
-    padding-top: 10px; /* Khoảng cách phía trên */
-    padding-bottom: 10px; /* Khoảng cách phía dưới */
-    align-items: stretch; /* Kéo dài nội dung theo chiều cao */
-  }
-
-  /* Đảm bảo các cột trong chi tiết đơn hàng liền mạch */
-  .row > div {
-    display: flex;
-    align-items: center;
-  }
-`}</style>
-
-  </div>
-
-
   );
 };
 

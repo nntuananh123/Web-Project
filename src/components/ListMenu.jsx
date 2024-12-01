@@ -85,7 +85,7 @@ const ListMenu = ({ searchResults }) => {
       // Lưu lại thông tin đơn hàng với quantity được cập nhật
       localStorage.setItem("orderDetails", JSON.stringify(currentOrder));
   
-      alert(`Product ${productId} added to order ${orderId} in table ${table}. Quantity: ${existingProduct ? existingProduct.quantity : 1}`);
+      console.log(`Product ${productId} added to order ${orderId} in table ${table}. Quantity: ${existingProduct ? existingProduct.quantity : 1}`);
     } catch (error) {
       console.error("Error adding product to order:", error);
     }
@@ -104,8 +104,7 @@ const ListMenu = ({ searchResults }) => {
 
                         <div class="ref-products">
                         {products.map((product) => (
-                            <a class="ref-product" key={product.id}>
-                            
+                            <a class="ref-product pb-5" key={product.id}>                           
                                     <div class="ref-media"><img class="ref-image" src={product.image_url} loading="lazy" />
                                     </div>
                                     <div class="ref-product-data">
@@ -115,10 +114,7 @@ const ListMenu = ({ searchResults }) => {
                                     </div>
                                     <div class="ref-addons"><a class="ref-button preview-toggle" href="#" onClick={() => handleAddToOrder(product.id)}>Add to Cart</a></div>
                                 </a>))}
-                            </div>
-
-
-                                
+                            </div>                          
                             <div class="ref-product-preview">
                                 <div class="ref-product-preview-header">
                                     <div class="ref-title"></div>

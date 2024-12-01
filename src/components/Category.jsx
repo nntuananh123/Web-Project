@@ -31,7 +31,7 @@ const Category = ({ setCategory, setSearchResults }) => {
       <ul className="navbar-nav">
         <li className="nav-item dropdown">
           <a
-            className="nav-link dropdown-toggle"
+            className="nav-link dropdown-toggle fs-5"
             href="#"
             id="navbarDropdown"
             role="button"
@@ -42,17 +42,17 @@ const Category = ({ setCategory, setSearchResults }) => {
           </a>
           <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
             <li>
-              <a className="dropdown-item" href="#" onClick={() => handleCategoryClick('All')}>
+              <a className="dropdown-item fs-5" href="#" onClick={() => handleCategoryClick('All')}>
                 All
               </a>
             </li>
             <li>
-              <a className="dropdown-item" href="#" onClick={() => handleCategoryClick('Food')}>
+              <a className="dropdown-item fs-5" href="#" onClick={() => handleCategoryClick('Food')}>
                 Food
               </a>
             </li>
             <li>
-              <a className="dropdown-item" href="#" onClick={() => handleCategoryClick('Drink')}>
+              <a className="dropdown-item fs-5" href="#" onClick={() => handleCategoryClick('Drink')}>
                 Drink
               </a>
             </li>

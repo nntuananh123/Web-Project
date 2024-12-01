@@ -3,59 +3,60 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+
 const ListCart = () => {
 
   const [products, setProducts] = useState([]);
 
-const fetchProducts = async () => {
-  try {
-    // Lấy danh sách orderDetails từ localStorage
-    const orderDetails = JSON.parse(localStorage.getItem("orderDetails")) || [];
+  const fetchProducts = async () => {
+    try {
+      // Lấy danh sách orderDetails từ localStorage
+      const orderDetails = JSON.parse(localStorage.getItem("orderDetails")) || [];
 
-    // Nếu không có orderDetails, không cần tiếp tục
-    if (orderDetails.length === 0) {
-      console.warn("No products in localStorage to fetch.");
-      return;
+      // Nếu không có orderDetails, không cần tiếp tục
+      if (orderDetails.length === 0) {
+        console.warn("No products in localStorage to fetch.");
+        return;
+      }
+
+      // Gửi yêu cầu API để lấy danh sách sản phẩm
+      const response = await fetch("http://localhost:8080/mycoffee/product");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch products.");
+      }
+
+      const data = await response.json();
+      
+      // Kiểm tra xem có trường result không
+      const productsData = data.result || []; // Lấy mảng sản phẩm từ trường 'result'
+
+      // Lọc các sản phẩm có productId có trong orderDetails
+      const filteredProducts = productsData.filter(product =>
+        orderDetails.some(item => item.productId === product.id) // Lọc sản phẩm theo productId có trong orderDetails
+      );
+
+      // Ánh xạ sản phẩm kèm theo quantity, table, orderId từ localStorage
+      const mappedProducts = filteredProducts.map((item) => {
+        const orderDetail = orderDetails.find(detail => detail.productId === item.id);
+        return {
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          category: item.category.name,
+          image_url: item.image_url,
+          quantity: orderDetail ? orderDetail.quantity : 0, // Thêm quantity từ orderDetails
+          table: orderDetail ? orderDetail.table : 0, // Thêm table từ orderDetails
+          orderId: orderDetail ? orderDetail.orderId : '', // Thêm orderId từ orderDetails
+        };
+      });
+
+      // Lưu vào state
+      setProducts(mappedProducts);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
     }
-
-    // Gửi yêu cầu API để lấy danh sách sản phẩm
-    const response = await fetch("http://localhost:8080/mycoffee/product");
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch products.");
-    }
-
-    const data = await response.json();
-    
-    // Kiểm tra xem có trường result không
-    const productsData = data.result || []; // Lấy mảng sản phẩm từ trường 'result'
-
-    // Lọc các sản phẩm có productId có trong orderDetails
-    const filteredProducts = productsData.filter(product =>
-      orderDetails.some(item => item.productId === product.id) // Lọc sản phẩm theo productId có trong orderDetails
-    );
-
-    // Ánh xạ sản phẩm kèm theo quantity, table, orderId từ localStorage
-    const mappedProducts = filteredProducts.map((item) => {
-      const orderDetail = orderDetails.find(detail => detail.productId === item.id);
-      return {
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        category: item.category.name,
-        image_url: item.image_url,
-        quantity: orderDetail ? orderDetail.quantity : 0, // Thêm quantity từ orderDetails
-        table: orderDetail ? orderDetail.table : 0, // Thêm table từ orderDetails
-        orderId: orderDetail ? orderDetail.orderId : '', // Thêm orderId từ orderDetails
-      };
-    });
-
-    // Lưu vào state
-    setProducts(mappedProducts);
-  } catch (error) {
-    console.error("Failed to fetch products:", error);
-  }
-};
+  };
 
   
 
@@ -147,7 +148,7 @@ const fetchProducts = async () => {
   
       // Kiểm tra nếu không có orderId hoặc orderDetails trống
       if (!orderId || orderDetails.length === 0) {
-        alert("No order or products to submit.");
+        console.log("No order or products to submit.");
         return;
       }
   
@@ -180,10 +181,10 @@ const fetchProducts = async () => {
         }
       }
   
-      alert("All products submitted successfully.");
+      console.log("All products submitted successfully.");
     } catch (error) {
       console.error("Error submitting order details:", error);
-      alert("Failed to submit order details.");
+      console.log("Failed to submit order details.");
     }
     try {
       // Xóa tất cả dữ liệu trong localStorage
@@ -202,7 +203,7 @@ const fetchProducts = async () => {
       const table = parseInt(localStorage.getItem("table"), 10);
   
       if (!orderId || isNaN(table)) {
-        alert("Order ID or table not found in localStorage.");
+        console.log("Order ID or table not found in localStorage.");
         return;
       }
   
@@ -230,13 +231,13 @@ const fetchProducts = async () => {
   
       const data = await response.json();
       if (data.code === 0) {
-        alert("Order updated successfully.");
+        console.log("Order updated successfully.");
       } else {
-        alert(`Failed to update order: ${data.message}`);
+        console.log(`Failed to update order: ${data.message}`);
       }
     } catch (error) {
       console.error("Error updating order:", error);
-      alert("An error occurred while updating the order.");
+      console.log("An error occurred while updating the order.");
     }
     handleSubmitOrderDetails();
   };
@@ -252,7 +253,6 @@ const fetchProducts = async () => {
                 Unable to load shopping cart.
               </div>
               <div className="ref-cart" style={{ display: 'block' }}>
-                <div className="ref-heading">Shopping Cart</div>
                 <div className="ref-th">
                   <div className="ref-product-col">Product</div>
                   <div className="ref-price-col">Price</div>

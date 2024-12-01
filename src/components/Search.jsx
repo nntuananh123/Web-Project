@@ -16,7 +16,6 @@ const Search = ({ setSearchResults }) => {
   // Gọi API khi debouncedKeyword thay đổi
   useEffect(() => {
     const handleSearch = async () => {
-
       try {
         const response = await fetch(
           `http://localhost:8080/mycoffee/product/search?keyword=${debouncedKeyword}`,
@@ -45,12 +44,12 @@ const Search = ({ setSearchResults }) => {
 
   return (
     <>
-      <div className="d-flex align-items-center mx-auto">
-        <div className="search-box d-flex align-items-center border">
+      <div className="search-box d-flex justify-content-center align-items-center w-100">
+        <div className="input-group search-box flex-grow-1 flex-md-grow-0">
           <input
-            placeholder="Search..."
-            className="input"
             type="text"
+            className="form-control"
+            placeholder="Search..."
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)} // Cập nhật keyword mỗi khi gõ
           />
@@ -59,21 +58,17 @@ const Search = ({ setSearchResults }) => {
 
       <style jsx>{`
         .search-box {
-          height: 45px;
+          max-width: 300px; /* Điều chỉnh chiều rộng tối đa */
+        }
+
+        @media (min-width: 576px) {
+          .search-box {
+            max-width: 800px; /* Tăng chiều rộng trên màn hình lớn */
+          }
+        }
+
+        .form-control {
           border-radius: 5px;
-          background-color: #333333;
-        }
-
-        .input {
-          color: #cccccc;
-          background-color: #333333;
-          border: none;
-          outline: none;
-          padding: 5px;
-        }
-
-        .input::placeholder {
-          color: #808080;
         }
       `}</style>
     </>
