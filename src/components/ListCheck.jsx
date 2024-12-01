@@ -37,7 +37,6 @@ const ListCheck = () => {
       const data = await response.json();
   
       const ordersData = data.result || []; // Lấy mảng đơn hàng từ API
-  
       // Ánh xạ đơn hàng
       const mappedOrders = ordersData.map((order) => ({
         orderId: order.orderId,
@@ -68,7 +67,39 @@ const ListCheck = () => {
 
   useEffect(() => {
     fetchOrders();
+
+    // Thiết lập WebSocket để lắng nghe thông báo
+    const ws = new WebSocket("ws://localhost:8080/mycoffee/ws/orders");
+
+    ws.onopen = () => {
+      console.log("Connected to WebSocket");
+    };
+
+    ws.onmessage = async (event) => {
+      console.log("Received message:", event.data);
+
+      // Cập nhật danh sách đơn hàng khi có thông báo mới
+      try {
+        fetchOrders();
+      } catch (error) {
+        console.error("Error updating orders:", error);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    // Cleanup WebSocket khi component unmount
+    return () => {
+      ws.close();
+    };
   }, []);
+  
 
   const handleRemove = async (orderId) => {
     try {
@@ -83,7 +114,7 @@ const ListCheck = () => {
       const response = await fetch(
         `http://localhost:8080/mycoffee/order/${orderId}`,
         {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -96,13 +127,26 @@ const ListCheck = () => {
       }
   
       // Nếu xóa thành công, cập nhật lại danh sách đơn hàng
-      setOrders((prevOrders) =>
-        prevOrders.filter((order) => order.orderId !== orderId)
-      );
+      setOrders((prevOrders) => {
+        const updatedOrders = prevOrders.filter(
+          (order) => order.orderId !== orderId
+        );
+  
+        // Xóa lớp `border-top-solid` khỏi order đầu tiên nếu cần
+        if (updatedOrders.length > 0) {
+          updatedOrders[0] = {
+            ...updatedOrders[0],
+            isFirstOrder: true, // Đánh dấu order đầu tiên
+          };
+        }
+  
+        return updatedOrders;
+      });
     } catch (error) {
       console.error("Failed to remove order:", error);
     }
   };
+  
 
 
   const handleStatusToggle = (orderId) => {
