@@ -56,6 +56,10 @@ const ListCart = ({ updateCartCount }) => {
     }
   };
   
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
 
   // Hàm để tăng số lượng
   const handleIncrease = (id) => {
@@ -184,11 +188,10 @@ const ListCart = ({ updateCartCount }) => {
       console.error("Error clearing local storage:", error);
     }
       // Reload lại trang
-    window.location.reload();
+      window.location.reload();
   };
 
   const handleUpdateOrder = async () => {
-    await handleSubmitOrderDetails();
     try {
       // Lấy orderId và table từ localStorage
       const orderId = localStorage.getItem("orderId");
@@ -204,7 +207,6 @@ const ListCart = ({ updateCartCount }) => {
   
       // Tạo Request body
       const requestBody = {
-        table,
         totalPrice: parseFloat(totalPrice), // Chuyển đổi từ chuỗi sang số
       };
   
@@ -231,14 +233,10 @@ const ListCart = ({ updateCartCount }) => {
       console.error("Error updating order:", error);
       console.log("An error occurred while updating the order.");
     }
+    handleSubmitOrderDetails();
   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
   return (
-
     <div className="container py-5">
       <div className="row mx-auto">
         <div className="col">

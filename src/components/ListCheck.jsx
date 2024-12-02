@@ -10,8 +10,19 @@ const ListCheck = () => {
     const [day, month, year] = date.split("-");
     const [hours, minutes, seconds] = time.split(":");
   
-    return new Date(year, month - 1, day, hours, minutes, seconds);
+    // Tạo đối tượng Date
+    const dateObj = new Date(year, month - 1, day, hours, minutes, seconds);
+  
+    // Chuyển đổi sang UTC+7
+    const utc7Offset = 7 * 60 * 60 * 1000; // Chuyển đổi từ giờ sang milliseconds
+    const utc7Date = new Date(dateObj.getTime() + utc7Offset);
+  
+    return utc7Date.toLocaleString("en-US", {
+      timeZone: "Asia/Bangkok",
+      hour12: false, // Hiển thị dạng 24 giờ
+    });
   };
+  
   
   const fetchOrders = async () => {
     try {
@@ -221,7 +232,7 @@ const ListCheck = () => {
                             {isFirstDetail ? `$${order.totalPrice.toFixed(2)}` : ""}
                           </div>
                           <div className="col-2 text-center border-end">
-                            {isFirstDetail ? order.created_at : ""}
+                            {isFirstDetail ? parseDate(order.created_at) : ""}
                           </div>
                           <div className="col-1-5 text-center">
                             {isFirstDetail && (
