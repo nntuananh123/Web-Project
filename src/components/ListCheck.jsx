@@ -25,7 +25,7 @@ const ListCheck = () => {
   
       // Gửi request với Authorization Header
       const response = await fetch(
-        `${process.env.URL}/mycoffee/order/with-detail`,
+        `http://${process.env.REACT_APP_API_URL}/mycoffee/order/with-details`,
         {
           headers: {
             Authorization: `Bearer ${token}`, // Thêm token vào Header
@@ -43,7 +43,7 @@ const ListCheck = () => {
         table: order.table,
         totalPrice: order.totalPrice,
         created_at: order.created_at,
-        status: order.status, // Trạng thái mặc định
+        status: order.status, 
         orderDetails: order.orderDetails.map((detail) => ({
           quantity: detail.quantity,
           productName: detail.productName,
@@ -69,7 +69,7 @@ const ListCheck = () => {
     fetchOrders();
 
     // Thiết lập WebSocket để lắng nghe thông báo
-    const ws = new WebSocket('ws://${process.env.REACT_APP_API_URL}/mycoffee/ws/orders');
+    const ws = new WebSocket(`ws://${process.env.REACT_APP_API_URL}/mycoffee/ws/orders`);
 
     ws.onopen = () => {
       console.log("Connected to WebSocket");
