@@ -1,10 +1,8 @@
 import React from 'react';
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
-const ListCart = () => {
+const ListCart = ({ updateCartCount }) => {
 
   const [products, setProducts] = useState([]);
 
@@ -57,17 +55,7 @@ const ListCart = () => {
       console.error("Failed to fetch products:", error);
     }
   };
-
   
-
-  useEffect(() => {
-    fetchProducts();
-    
-  }, []);
-
-  
-
-
 
   // Hàm để tăng số lượng
   const handleIncrease = (id) => {
@@ -116,19 +104,22 @@ const ListCart = () => {
     try {
       // Lấy danh sách orderDetails từ localStorage
       const orderDetails = JSON.parse(localStorage.getItem("orderDetails")) || [];
-  
+
       // Lọc bỏ sản phẩm có productId trùng với id
       const updatedOrderDetails = orderDetails.filter(
         (item) => item.productId !== id
       );
-  
+
       // Lưu danh sách mới vào localStorage
       localStorage.setItem("orderDetails", JSON.stringify(updatedOrderDetails));
-    
       // Cập nhật lại giao diện (nếu cần)
       setProducts((prevProducts) =>
         prevProducts.filter((product) => product.id !== id)
       );
+
+      // Gọi hàm updateCartCount để cập nhật real-time
+      updateCartCount();
+
     } catch (error) {
       console.error("Error removing product from localStorage:", error);
     }
@@ -197,6 +188,7 @@ const ListCart = () => {
   };
 
   const handleUpdateOrder = async () => {
+    await handleSubmitOrderDetails();
     try {
       // Lấy orderId và table từ localStorage
       const orderId = localStorage.getItem("orderId");
@@ -239,10 +231,14 @@ const ListCart = () => {
       console.error("Error updating order:", error);
       console.log("An error occurred while updating the order.");
     }
-    handleSubmitOrderDetails();
   };
 
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   return (
+
     <div className="container py-5">
       <div className="row mx-auto">
         <div className="col">

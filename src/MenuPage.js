@@ -9,6 +9,14 @@ import ListMenu from './components/ListMenu';
 function MenuPage() {
   const [searchResults, setSearchResults] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [cartCount, setCartCount] = useState(
+    JSON.parse(localStorage.getItem('orderDetails'))?.length || 0
+  );
+
+  const updateCartCount = () => {
+    const orderDetails = JSON.parse(localStorage.getItem('orderDetails')) || [];
+    setCartCount(orderDetails.length);
+  };
 
   return (
     <>
@@ -18,9 +26,16 @@ function MenuPage() {
           href="assets/bootstrap/css/bootstrap.min.css?h=ae25e30cd2ef0f4f5b70ebf4c668048b"
         />
       </Helmet>
-      <NavBar showSearch={true} setSearchResults={setSearchResults} />
+      <NavBar
+        showSearch={true}
+        setSearchResults={setSearchResults}
+        cartCount={cartCount}
+      />
       <Category setCategory={setSelectedCategory} setSearchResults={setSearchResults} />
-      <ListMenu searchResults={searchResults} />
+      <ListMenu
+        searchResults={searchResults}
+        updateCartCount={updateCartCount}
+      />
     </>
   );
 }
