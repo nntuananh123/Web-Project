@@ -25,7 +25,7 @@ const ListCheck = () => {
   
       // Gửi request với Authorization Header
       const response = await fetch(
-        "http://localhost:8080/mycoffee/order/with-details",
+        `${process.env.URL}/mycoffee/order/with-detail`,
         {
           headers: {
             Authorization: `Bearer ${token}`, // Thêm token vào Header
@@ -69,7 +69,7 @@ const ListCheck = () => {
     fetchOrders();
 
     // Thiết lập WebSocket để lắng nghe thông báo
-    const ws = new WebSocket("ws://localhost:8080/mycoffee/ws/orders");
+    const ws = new WebSocket('ws://${process.env.REACT_APP_API_URL}/mycoffee/ws/orders');
 
     ws.onopen = () => {
       console.log("Connected to WebSocket");
@@ -112,7 +112,7 @@ const ListCheck = () => {
       }
   
       const response = await fetch(
-        `http://localhost:8080/mycoffee/order/${orderId}`,
+        `http://${process.env.REACT_APP_API_URL}/mycoffee/order/${orderId}`,
         {
           method: "DELETE",
           headers: {

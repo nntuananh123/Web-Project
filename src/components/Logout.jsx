@@ -13,7 +13,7 @@ const Logout = () => {
       }
 
       // Gửi yêu cầu POST đến /auth/logout
-      const response = await fetch('http://localhost:8080/mycoffee/auth/logout', {
+      const response = await fetch(`http://localhost:8080/mycoffee/auth/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

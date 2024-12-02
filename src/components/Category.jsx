@@ -5,7 +5,7 @@ const Category = ({ setCategory, setSearchResults }) => {
     setCategory(categoryName); // Cập nhật category hiện tại
 
     try {
-      const response = await fetch('http://localhost:8080/mycoffee/product', { method: 'GET' });
+      const response = await fetch(`http://${process.env.REACT_APP_API_URL}/mycoffee/product`, { method: 'GET' });
 
       if (!response.ok) throw new Error('Failed to fetch products');
 
