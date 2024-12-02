@@ -20,7 +20,7 @@ const ListMenu = ({ searchResults, updateCartCount }) => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch(`http://${process.env.URL}/mycoffee/product`);
+      const response = await fetch(`http://${process.env.REACT_APP_API_URL}/mycoffee/product`);
       const data = await response.json();
       setProducts(data.result || []);
     } catch (error) {

@@ -47,13 +47,23 @@ const Category = ({ setCategory, setSearchResults }) => {
               </a>
             </li>
             <li>
-              <a className="dropdown-item fs-5" href="#" onClick={() => handleCategoryClick('Food')}>
-                Food
+              <a className="dropdown-item fs-5" href="#" onClick={() => handleCategoryClick('Cafe')}>
+                Cafe
               </a>
             </li>
             <li>
-              <a className="dropdown-item fs-5" href="#" onClick={() => handleCategoryClick('Drink')}>
-                Drink
+              <a className="dropdown-item fs-5" href="#" onClick={() => handleCategoryClick('Juice')}>
+                Juice
+              </a>
+            </li>
+            <li>
+              <a className="dropdown-item fs-5" href="#" onClick={() => handleCategoryClick('Smoothie')}>
+                Smoothie
+              </a>
+            </li>
+            <li>
+              <a className="dropdown-item fs-5" href="#" onClick={() => handleCategoryClick('Cake')}>
+                Cake
               </a>
             </li>
           </ul>
