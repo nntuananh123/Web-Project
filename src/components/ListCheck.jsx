@@ -167,11 +167,11 @@ const ListCheck = () => {
           ? {
               ...order,
               status:
-                order.status === "none"
+                order.status === "NONE"
                   ? "pending"
                   : order.status === "pending"
                   ? "finished"
-                  : "none",
+                  : "NONE",
             }
           : order
       )
