@@ -160,22 +160,56 @@ const ListCheck = () => {
   
 
 
-  const handleStatusToggle = (orderId) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.orderId === orderId
-          ? {
-              ...order,
-              status:
-                order.status === "NONE"
-                  ? "pending"
-                  : order.status === "pending"
-                  ? "finished"
-                  : "NONE",
-            }
-          : order
-      )
-    );
+  const handleStatusToggle = async (orderId) => {
+    try {
+      // Lấy thông tin trạng thái hiện tại của đơn hàng
+      const currentOrder = orders.find((order) => order.orderId === orderId);
+      if (!currentOrder) {
+        console.error("Order not found");
+        return;
+      }
+  
+      // Xác định trạng thái mới
+      const newStatus =
+        currentOrder.status === "NONE"
+          ? "pending"
+          : currentOrder.status === "pending"
+          ? "finished"
+          : "NONE";
+  
+      // Lấy token từ localStorage
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        console.error("No token found. Please log in.");
+        return;
+      }
+  
+      // Gửi request PUT để cập nhật trạng thái
+      const response = await fetch(
+        `http://${process.env.REACT_APP_API_URL}/mycoffee/order/${orderId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: newStatus }), // Truyền trạng thái mới
+        }
+      );
+  
+      if (!response.ok) {
+        throw new Error("Failed to update order status");
+      }
+  
+      // Nếu cập nhật thành công, cập nhật lại danh sách đơn hàng
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.orderId === orderId ? { ...order, status: newStatus } : order
+        )
+      );
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
   };
 
   return (
