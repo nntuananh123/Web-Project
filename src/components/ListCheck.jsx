@@ -17,11 +17,19 @@ const ListCheck = () => {
     const utc7Offset = 7 * 60 * 60 * 1000; // Chuyển đổi từ giờ sang milliseconds
     const utc7Date = new Date(dateObj.getTime() + utc7Offset);
   
-    return utc7Date.toLocaleString("en-US", {
+    // Trả về định dạng ngày/tháng/năm giờ:phút:giây
+    return utc7Date.toLocaleString("vi-VN", {
       timeZone: "Asia/Bangkok",
-      hour12: false, // Hiển thị dạng 24 giờ
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     });
   };
+  
+  
   
   
   const fetchOrders = async () => {
@@ -63,19 +71,19 @@ const ListCheck = () => {
         })),
       }));
 
-      // Sắp xếp đơn hàng theo thời gian (mới nhất lên trên)
+      // Sắp xếp đơn hàng theo thời gian (ngày, giờ, phút, giây)
       mappedOrders.sort((a, b) => {
-        const dateA = parseDate(a.created_at);
-        const dateB = parseDate(b.created_at);
-        return dateB - dateA; // Ngày gần nhất lên trên
-      });  
+        const dateA = new Date(parseDate(a.created_at)).getTime();
+        const dateB = new Date(parseDate(b.created_at)).getTime();
+        return dateB - dateA; // Ngày và giờ gần nhất lên trên
+      });
+
       setOrders(mappedOrders);
     } catch (error) {
       console.error("Failed to fetch orders:", error);
     }
   };
   
-
   useEffect(() => {
     fetchOrders();
 
