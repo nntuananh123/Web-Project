@@ -44,7 +44,7 @@ const ListCheck = () => {
   
       // Gửi request với Authorization Header
       const response = await fetch(
-        `http://${process.env.REACT_APP_API_URL}/mycoffee/order/with-details`,
+        `https://${process.env.REACT_APP_API_URL}/mycoffee/order/with-details`,
         {
           headers: {
             Authorization: `Bearer ${token}`, // Thêm token vào Header
@@ -131,7 +131,7 @@ const ListCheck = () => {
       }
   
       const response = await fetch(
-        `http://${process.env.REACT_APP_API_URL}/mycoffee/order/${orderId}`,
+        `https://${process.env.REACT_APP_API_URL}/mycoffee/order/${orderId}`,
         {
           method: "DELETE",
           headers: {
@@ -194,7 +194,7 @@ const ListCheck = () => {
   
       // Gửi request PUT để cập nhật trạng thái
       const response = await fetch(
-        `http://${process.env.REACT_APP_API_URL}/mycoffee/order/${orderId}`,
+        `https://${process.env.REACT_APP_API_URL}/mycoffee/order/${orderId}`,
         {
           method: "PUT",
           headers: {

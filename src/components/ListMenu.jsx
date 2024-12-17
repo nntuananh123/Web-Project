@@ -16,7 +16,7 @@ const ListMenu = ({ searchResults, updateCartCount }) => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch(`http://${process.env.REACT_APP_API_URL}/mycoffee/product`);
+      const response = await fetch(`https://${process.env.REACT_APP_API_URL}/mycoffee/product`);
       const data = await response.json();
       setProducts(data.result || []);
     } catch (error) {
@@ -45,7 +45,7 @@ const ListMenu = ({ searchResults, updateCartCount }) => {
       let orderId = localStorage.getItem("orderId");
 
       if (!orderId) {
-        const response = await fetch(`http://${process.env.REACT_APP_API_URL}/mycoffee/order`, {
+        const response = await fetch(`https://${process.env.REACT_APP_API_URL}/mycoffee/order`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
