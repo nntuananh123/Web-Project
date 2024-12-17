@@ -18,7 +18,7 @@ const Search = ({ setSearchResults }) => {
     const handleSearch = async () => {
       try {
         const response = await fetch(
-          `https://${process.env.REACT_APP_API_URL}/mycoffee/product/search?keyword=${debouncedKeyword}`,
+          `http://${process.env.REACT_APP_API_URL}/mycoffee/product/search?keyword=${debouncedKeyword}`,
           { method: "GET" }
         );
 

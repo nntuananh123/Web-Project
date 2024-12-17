@@ -18,7 +18,7 @@ const LoginForm = () => {
     };
 
     try {
-      const response = await axios.post(`https://${process.env.REACT_APP_API_URL}/mycoffee/auth/token`, requestBody);
+      const response = await axios.post(`http://${process.env.REACT_APP_API_URL}/mycoffee/auth/token`, requestBody);
 
       if (response.data && response.data.result && response.data.result.token) {
         const token = response.data.result.token;

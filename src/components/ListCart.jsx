@@ -18,7 +18,7 @@ const ListCart = ({ updateCartCount }) => {
       }
 
       // Gửi yêu cầu API để lấy danh sách sản phẩm
-      const response = await fetch(`https://${process.env.REACT_APP_API_URL}/mycoffee/product`);
+      const response = await fetch(`http://${process.env.REACT_APP_API_URL}/mycoffee/product`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch products.");
@@ -149,7 +149,7 @@ const ListCart = ({ updateCartCount }) => {
   
       // Lặp qua từng sản phẩm và gửi POST request
       for (const { productId, quantity } of orderDetails) {
-        const response = await fetch(`https://${process.env.REACT_APP_API_URL}/mycoffee/order-detail`, {
+        const response = await fetch(`http://${process.env.REACT_APP_API_URL}/mycoffee/order-detail`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -211,7 +211,7 @@ const ListCart = ({ updateCartCount }) => {
       };
   
       // Gửi yêu cầu PUT đến API
-      const response = await fetch(`https://${process.env.REACT_APP_API_URL}/mycoffee/order/${orderId}`, {
+      const response = await fetch(`http://${process.env.REACT_APP_API_URL}/mycoffee/order/${orderId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
